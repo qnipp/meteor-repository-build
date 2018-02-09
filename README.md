@@ -4,7 +4,7 @@ Build a Meteor app from a Git or SVN repository for using it in a nginx + Passen
 
 ## Motivation
 
-I run a server with a number of Meteor apps on [nginx](https://nginx.org/) and [Passenger](https://www.phusionpassenger.com/). To simplify the roll-out of a new version of an app, I've written the script *repository_build.sh*. It retrieves the source code from the SVN or Git repository, builds the Meteor app and installs it. Afterwards, Passenger is instructed to restart the app. For easier rebuild a script is stored into the app root directory with the used parameters.
+I run a server with a number of Meteor apps on [nginx](https://nginx.org/) and [Passenger](https://www.phusionpassenger.com/). To simplify the roll-out of a new version of an app, I've written the script [repository_build.sh](repository_build.sh). It retrieves the source code from the SVN or Git repository, builds the Meteor app and installs it. Afterwards, Passenger is instructed to restart the app. For easier rebuild a script is stored into the app root directory with the used parameters.
 
 As different Meteor versions need different versions of node, the script copies the approbriate node version as delivered as part of the Meteor installation into the root directory of the app. So, you can run different Meteor/node versions on the same installation.
 
@@ -27,7 +27,7 @@ The **project** parameter is used to determine the path underneath the app direc
 
 ## nginx configuration
 
-The configuration files resist typically (at least within Debian) in */etc/nginx/sites-available*, where the files are symbolically linked to */etc/nginx/sites-enabled*. Take [nginx.example.com] and alter it according your own needs.
+The configuration files resist typically (at least within Debian) in */etc/nginx/sites-available*, where the files are symbolically linked to */etc/nginx/sites-enabled*. Take [nginx.example.com](nginx.example.com) as example and alter it according your own needs (especially by replacing *example.com* with your own domain/project name).
 
 ## Integration into Git
 
