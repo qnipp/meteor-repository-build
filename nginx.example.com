@@ -24,13 +24,7 @@ server {
     passenger_env_var MAIL_URL smtp://localhost:25/;
 
     # Store the content of production.json here
-    passenger_env_var METEOR_SETTINGS '
-{
-  "some_options": {
-    "key": "value"
-  }
-}
-';
+    passenger_env_var METEOR_SETTINGS '{"some_options":{"key":"value"}}';
 
     # Use the node version determined after building
     passenger_nodejs /var/meteor-apps/example.com/node;
