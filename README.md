@@ -15,13 +15,12 @@ nginx, Passender and Meteor must already be installed on the server.
 1. Copy the script *repository_build.sh* to */usr/local/bin*
 2. Give it execution permission by `sudo chmod 755 /usr/local/bin/repository_build.sh`
 3. Replace the */srv/meteor-apps* at the start of the script to your preferred path, where the Meteor apps should be running.
-4. Set the the **METEOR_WAREHOUSE_DIR** variable, if you want to use a central repository for all Meteor packages instead of *~/.meteor*.
+4. Set the the **HOME** variable, if you want to use a central repository for all Meteor packages instead of *~/.meteor*.
 
-If you use the **METEOR_WAREHOUSE_DIR** variable, all users can use the same directory for the Meteor packages. You have to take care of the right permissions, so the respective users have read and write access. For initiatlization, [install Meteor as usual](https://www.meteor.com/install) and move the contents of the directory *~/.meteor* into **METEOR_WAREHOUSE_DIR**.
-
+If you use the **HOME** variable, all users can use the same directory for the Meteor packages (by setting **METEOR_WAREHOUSE_DIR** to **$HOME/.meteor**. You have to take care of the right permissions, so the respective users have read and write access. 
 ## Usage
 
-```repository-build.sh project repository```
+```repository-build.sh project repository [branch]```
   
 The **project** parameter is used to determine the path underneath the app directory (*/srv/meteor-apps*). **repository** contains a URL or path to retrieve the source code using Subversion or Git. The Subversion URL must start with **svn**.
 
