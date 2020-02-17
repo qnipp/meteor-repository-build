@@ -1,51 +1,55 @@
 #!/bin/bash
 
 PROJECT="$1"
-BUILDDIR="/srv/meteor-apps/$PROJECT"
 
-# Check parameters
+# Change the path according your needs
+PROJECTDIR="/srv/meteor-apps/$PROJECT"
+
 if [ $# -lt 2 ] ; then
-	echo "Syntax; $0 project repository"
+	echo "Syntax; $0 project repository [branch]"
 	echo ""
 	echo "The type of repository is retrieved from the URL."
-	echo "The build software is installed into $BUILDDIR."
+	echo "The build software is installed into $PROJECTDIR."
 	exit 1
 fi
 
 REPOSITORY="$2"
-TMPDIR="/tmp/$PROJECT-$RANDOM"
-REBUILD="$BUILDDIR/rebuild.sh"
+BRANCH="$3"
 REALPATH=`realpath $0`
 
-# Set this variable, if you use a central meteor directory instead of ~/.meteor
-# export METEOR_WAREHOUSE_DIR=/opt/meteor
+TS=$(date +'%Y%m%d_%H%M%S')
+TMPDIR="/tmp/$PROJECT-$TS"
+BUILDDIR="$PROJECTDIR-$TS"
+OLDDIR="$PROJECTDIR-$TS.old"
+REBUILD="$BUILDDIR/rebuild.sh"
 
-# Checkout source code into temporary directory
+# Set this, if you want a central repository for the Meteor packages
+# export HOME=/home/meteor
+
 mkdir -p "$TMPDIR"
 
 if [ "${REPOSITORY:0:3}" = "svn" ] ; then
 	svn checkout "$REPOSITORY" "$TMPDIR"
 else
-	git clone "$REPOSITORY" "$TMPDIR"
+	git clone -b "${BRANCH:-master}" "$REPOSITORY" "$TMPDIR"
 fi
 
-# Build Meteor application
 cd "$TMPDIR"
-meteor npm install
-meteor build "$BUILDDIR" --directory $BUILDFLAGS
+meteor --version
+meteor npm install || exit 2
+meteor build "$BUILDDIR" --directory $BUILDFLAGS || exit 2
 
-# Save right version of node into $BUILDDIR
-cp `meteor node -e 'console.log(process.argv[0])'` $BUILDDIR
+# get right version of node and npm
+NODE_BINARY=`meteor node -e 'console.log(process.argv[0])'`
+NPM_BINARY="${NODE_BINARY%/*}/npm"
 
-# Install Meteor application and its dependencies
 cd "$BUILDDIR/bundle/programs/server"
-npm install
+"$NPM_BINARY" install || exit 2
 rm -rf "$TMPDIR"
+rm -rf $BUILDDIR/.bundle-garbage*
 
-# Restart app within passenger
-sudo passenger-config restart-app "$BUILDDIR"
+cp "$NODE_BINARY" "$BUILDDIR"
 
-# Save build settings to file for easier rebuild
 cat <<EOF > $REBUILD
 #!/bin/sh
 
@@ -55,3 +59,10 @@ EOF
 chmod 775 $REBUILD
 
 echo "File to rebuild with the same parameters saved to $REBUILD"
+
+mv $PROJECTDIR $OLDDIR
+mv $BUILDDIR $PROJECTDIR
+
+sudo passenger-config restart-app "$PROJECTDIR"
+
+rm -rf $OLDDIR
